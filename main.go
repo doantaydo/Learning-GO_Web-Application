@@ -1,39 +1,28 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
+	"net/http"
 )
 
-type Animes struct {
-	AnimeName   string `json:"anime_name"`
-	ReleaseYear int    `json:"release_year"`
-	NumOfEp     int    `json:"num_of_ep"`
-}
+var portNumber = ":8080"
 
 func main() {
-	user1 := Animes{
-		AnimeName:   "A",
-		ReleaseYear: 2,
-		NumOfEp:     1,
-	}
+	http.HandleFunc("/", Home)
+	http.HandleFunc("/about", About)
 
-	user2 := Animes{
-		AnimeName:   "A",
-		ReleaseYear: 2,
-		NumOfEp:     1,
-	}
+	fmt.Println("Run Web Application at localhost" + portNumber)
+	_ = http.ListenAndServe(portNumber, nil)
+}
 
-	var newAnimeList []Animes
-	newAnimeList = append(newAnimeList, user1)
-	newAnimeList = append(newAnimeList, user2)
+func Home(w http.ResponseWriter, r *http.Request) {
+	_, _ = fmt.Fprintf(w, "This is Home Page!")
+}
 
-	newJson, err := json.MarshalIndent(newAnimeList, "", "    ")
+func About(w http.ResponseWriter, r *http.Request) {
+	_, _ = fmt.Fprintf(w, "This is About Page!")
+}
 
-	if err != nil {
-		fmt.Println("Mershal err: ", err)
-	}
-
-	log.Println(string(newJson))
+func addValue(x, y int) (int, error) {
+	return x + y, nil
 }
