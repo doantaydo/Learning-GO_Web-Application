@@ -10,21 +10,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" 
         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
-
-    <style>
-        .my-footer {
-            height: 5em;
-            background-color: #163b65;
-            margin-top: 1.5em;
-            padding: 1em;
-            color: white;
-            font-size: 80%;
-        }
-
-        .room-image {
-            max-width: 50%;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
 </head>
 
 <body>
@@ -67,7 +53,7 @@
             <div class="col">
                 <h1>Make reservation</h1>
 
-                <form method="post" action="" class="needs-validation" novalidate>
+                <form method="post" action="" class="needs-validation" novalidate class="needs-validation">
                     <div class="form-group mt-5">
                         <label for="first_name">First Name</label>
                         <input type="text" name="first_name" id="first_name" class="form-control" required autocomplete="off">
@@ -120,6 +106,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" 
         crossorigin="anonymous"></script>
+
+    <script>
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+            }, false)
+        })
+        })()
+
+        document.getElementById("colorButton").addEventListener("click", function(){
+            let myEl = document.getElementById("myParagraph");
+            
+            if (myEl.classList.contains("red-text")) {
+                myEl.classList.remove("red-text");
+            } else {
+                myEl.classList.add("red-text");
+            }
+        });
+    </script>
 
 
 </body>
