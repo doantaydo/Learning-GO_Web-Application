@@ -6,12 +6,15 @@
     color: white;
     font-size: 80%;
 }
+
 .room-image {
     max-width: 50%;
 }
+
 .notie-container {
     box-shadow: none;
 }
+
 .datepicker {
-    z-index: 1000000000;
+    z-index: 10000;
 }
