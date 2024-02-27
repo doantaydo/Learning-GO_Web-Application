@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/packages/config"
-	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/packages/handlers"
-	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/packages/render"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/handlers"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/render"
 )
 
 var portNumber = ":8080"

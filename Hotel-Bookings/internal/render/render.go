@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/packages/config"
-	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/packages/models"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/models"
 	"github.com/justinas/nosurf"
 )
 
