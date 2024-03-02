@@ -19,21 +19,11 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
-	gob.Register(models.Reservation{})
-	app.InProduction = false
-	_ = SetUpAppConfig()
+	err := SetUpAppConfig()
 
-	session = scs.New()
-	session.Lifetime = 24 * time.Hour
-	session.Cookie.Persist = true
-	session.Cookie.SameSite = http.SameSiteLaxMode
-	session.Cookie.Secure = app.InProduction
-
-	app.Session = session
-
-	// http.HandleFunc("/", repo.Home)
-	// http.HandleFunc("/about", repo.About)
-	//http.HandleFunc("/favicon.ico", repo.EmptyFunc)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println("Run Web Application at localhost" + portNumber)
 	//_ = http.ListenAndServe(portNumber, nil)
@@ -43,23 +33,38 @@ func main() {
 		Handler: routes(&app),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
 
-func SetUpAppConfig() *handlers.Repository {
+func SetUpAppConfig() error {
+	// put in the session
+	gob.Register(models.Reservation{})
+	// if you want to change tmpl file and check easier, set app.UserCache = false
+	app.InProduction = false
+
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = app.InProduction
+
+	app.Session = session
+
 	// Add template to AppConfig then send to render
 	templateCache, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("Cannot create template cache", err)
+		return err
 	}
 	app.TemplateCache = templateCache
-	// if you want to change tmpl file and check easier, set app.UserCache = false
 	app.UseCache = app.InProduction
-	render.NewTemplates(&app)
+
 	// Send AppConfig to handlers
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 
-	return repo
+	render.NewTemplates(&app)
+
+	return nil
 }

@@ -13,9 +13,10 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-var template_cache = make(map[string]*template.Template)
+var functions = template.FuncMap{}
 
 var app *config.AppConfig
+var pathToTemplates = "./templates"
 
 // NewTemplates sets the config for the package
 func NewTemplates(a *config.AppConfig) {
@@ -60,23 +61,24 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
 	// get all file *.page.tmpl in templates folder
-	pages, err := filepath.Glob("./templates/*.page.tmpl")
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.tmpl", pathToTemplates))
 	if err != nil {
 		return myCache, err
 	}
 	// range through all file ending with *.page.tmpl
 	for _, page := range pages {
 		name := filepath.Base(page)
-		parTmpl, err := template.New(name).ParseFiles(page)
+		parTmpl, err := template.New(name).Funcs(functions).ParseFiles(page)
+		//parTmpl, err := template.New(name).ParseFiles(page)
 		if err != nil {
 			return myCache, err
 		}
-		matches, err := filepath.Glob("./templates/*.layout.tmpl")
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 		if err != nil {
 			return myCache, err
 		}
 		if len(matches) > 0 {
-			parTmpl, err = parTmpl.ParseGlob("./templates/*.layout.tmpl")
+			parTmpl, err = parTmpl.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}
@@ -88,41 +90,43 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	return myCache, nil
 }
 
-func RenderTemplate2(w http.ResponseWriter, tmpl string) {
-	fmt.Println("Check " + tmpl)
+// var template_cache = make(map[string]*template.Template)
 
-	var parTmpl *template.Template
-	var err error
+// func RenderTemplate2(w http.ResponseWriter, tmpl string) {
+// 	fmt.Println("Check " + tmpl)
 
-	// check if has template in cache
-	_, inMap := template_cache[tmpl]
+// 	var parTmpl *template.Template
+// 	var err error
 
-	if !inMap {
-		// need to create template in cache
-		err = CreateTemplateCache2(tmpl)
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println("Create template " + tmpl + " in cache.")
-	} else {
-		// have template in cache
-		fmt.Println("Using template " + tmpl + " in cache.")
-	}
+// 	// check if has template in cache
+// 	_, inMap := template_cache[tmpl]
 
-	parTmpl = template_cache[tmpl]
-	err = parTmpl.Execute(w, nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
+// 	if !inMap {
+// 		// need to create template in cache
+// 		err = CreateTemplateCache2(tmpl)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
+// 		fmt.Println("Create template " + tmpl + " in cache.")
+// 	} else {
+// 		// have template in cache
+// 		fmt.Println("Using template " + tmpl + " in cache.")
+// 	}
 
-func CreateTemplateCache2(tmpl string) error {
-	newTemplate, err := template.ParseFiles("./templates/"+tmpl, "./templates/base.layout.tmpl")
+// 	parTmpl = template_cache[tmpl]
+// 	err = parTmpl.Execute(w, nil)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// }
 
-	if err != nil {
-		return err
-	}
+// func CreateTemplateCache2(tmpl string) error {
+// 	newTemplate, err := template.ParseFiles("./templates/"+tmpl, "./templates/base.layout.tmpl")
 
-	template_cache[tmpl] = newTemplate
-	return nil
-}
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	template_cache[tmpl] = newTemplate
+// 	return nil
+// }
