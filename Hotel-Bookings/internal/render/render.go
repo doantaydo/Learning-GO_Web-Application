@@ -2,13 +2,14 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/helpers"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/models"
 	"github.com/justinas/nosurf"
 )
@@ -31,7 +32,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	return td
 }
 
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	// get the template cache from AppConfig
 	var templateSet map[string]*template.Template
 	if app.UseCache {
@@ -42,8 +43,8 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 
 	// get requested template from cache
 	t, ok := templateSet[tmpl]
-	if ok == false {
-		log.Fatal("Could not get template from template cache")
+	if !ok {
+		return errors.New("Could not get template from template cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -53,8 +54,11 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	// render template
 	_, err := buf.WriteTo(w)
 	if err != nil {
-		log.Println(err)
+		helpers.ServerError(w, err)
+		return err
 	}
+
+	return nil
 }
 
 func CreateTemplateCache() (map[string]*template.Template, error) {

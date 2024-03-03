@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/handlers"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/helpers"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/models"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/render"
 )
@@ -17,6 +19,8 @@ import (
 var portNumber = ":8080"
 var app config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 func main() {
 	err := SetUpAppConfig()
@@ -43,6 +47,12 @@ func SetUpAppConfig() error {
 	// if you want to change tmpl file and check easier, set app.UserCache = false
 	app.InProduction = false
 
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
 	session.Cookie.Persist = true
@@ -63,8 +73,8 @@ func SetUpAppConfig() error {
 	// Send AppConfig to handlers
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
-
 	render.NewTemplates(&app)
+	helpers.NewHelpers(&app)
 
 	return nil
 }
