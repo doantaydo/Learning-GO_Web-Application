@@ -22,3 +22,5 @@ go.work
 
 #.vscode config file
 .vscode
+
+database.yml
