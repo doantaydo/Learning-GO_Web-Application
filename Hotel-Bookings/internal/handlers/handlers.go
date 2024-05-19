@@ -6,23 +6,28 @@ import (
 	"net/http"
 
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/driver"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/forms"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/helpers"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/models"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/render"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/repository"
+	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/repository/dbrepo"
 )
 
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // the repository used by the  handler
 var Repo *Repository
 
 // creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
