@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql/driver"
 	"encoding/gob"
 	"fmt"
 	"log"
@@ -46,6 +45,9 @@ func main() {
 func SetUpAppConfig() (*driver.DB, error) {
 	// put in the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
 	// if you want to change tmpl file and check easier, set app.UserCache = false
 	app.InProduction = false
 
@@ -83,7 +85,7 @@ func SetUpAppConfig() (*driver.DB, error) {
 	// Send AppConfig to handlers
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
 	return db, nil
