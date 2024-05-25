@@ -5,5 +5,6 @@ import "github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal
 type DatabaseRepo interface {
 	AllUser() bool
 
-	InsertReservation(res models.Reservation) error
+	InsertReservation(res models.Reservation) (int, error)
+	InsertRoomRestriction(r models.RoomRestriction) error
 }
