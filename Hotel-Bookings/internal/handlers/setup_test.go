@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -22,8 +23,9 @@ import (
 var functions = template.FuncMap{}
 var app config.AppConfig
 var session *scs.SessionManager
+var pathToTemplates = "./../../templates"
 
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	// put in the session
 	gob.Register(models.Reservation{})
 	// if you want to change tmpl file and check easier, set app.UserCache = false
@@ -53,10 +55,14 @@ func getRoutes() http.Handler {
 	app.UseCache = app.InProduction
 
 	// Send AppConfig to handlers
-	repo := NewRepo(&app)
+	repo := NewTestRepo(&app)
 	NewHandlers(repo)
 	render.NewRenderer(&app)
 
+	os.Exit(m.Run())
+}
+
+func getRoutes() http.Handler {
 	//using chi package
 	mux := chi.NewRouter()
 
@@ -104,8 +110,6 @@ func NoSurf(next http.Handler) http.Handler {
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
-
-var pathToTemplates = "./../../templates"
 
 func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
