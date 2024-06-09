@@ -13,11 +13,19 @@ func (m *testDBRepo) AllUser() bool {
 
 // InsertReservation inserts a reservation into the database
 func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
+	// if the room id is 2, then fail; otherwise, pass
+	if res.RoomID == 2 {
+		return 0, errors.New("some errors")
+	}
 	return 1, nil
 }
 
 // InsertRoomRestriction inserts a room restriction into the database
 func (m *testDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
+	// if the room id is 2, then fail; otherwise, pass
+	if r.RoomID == 1000 {
+		return errors.New("some errors")
+	}
 	return nil
 }
 
@@ -28,7 +36,15 @@ func (m *testDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time, roo
 
 // SearchAvailabilityForAllRooms returns a slice of available room, if any, for give date range
 func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error) {
+	testtime, _ := time.Parse("2006-01-02", "2050-01-30")
+	if start == testtime {
+		return nil, errors.New("some errors!")
+	}
 	var rooms []models.Room
+	testtime, _ = time.Parse("2006-01-02", "2050-01-01")
+	if start == testtime {
+		rooms = append(rooms, models.Room{})
+	}
 	return rooms, nil
 }
 
