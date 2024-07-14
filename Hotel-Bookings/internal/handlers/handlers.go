@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/driver"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/forms"
-	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/helpers"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/models"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/render"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/repository"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/repository/dbrepo"
-	"github.com/go-chi/chi"
 )
 
 type Repository struct {
@@ -162,6 +161,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	roomID, _ := strconv.Atoi(r.Form.Get("room_id"))
 
 	available, err := m.DB.SearchAvailabilityByDatesByRoomID(startDate, endDate, roomID)
+
 	if err != nil {
 		resp := jsonResponse{
 			OK:      false,
@@ -190,14 +190,19 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 // ChooseRoom displays list f available rooms
 func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
-	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	exploded := strings.Split(r.RequestURI, "/")
+	roomID, err := strconv.Atoi(exploded[2])
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "missing url parameter")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
 	}
 
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Cannot get reservation from session!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
 	}
 
 	res.RoomID = roomID
@@ -221,7 +226,8 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 
 	room, err := m.DB.GetRoomByID(roomID)
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Cannot get room by ID")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
