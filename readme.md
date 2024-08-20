@@ -9,3 +9,5 @@ In this course, I built a Basic Web Application and a Bookings and Reservations 
 - Uses the [chi router](https://github.com/go-chi/chi)
 - Uses [alex edwards SCS](https://github.com/alexadwards/scs/v2) session management
 - Uses [nosurf](https://github.com/justinas/nosurf)
+- Uses PostgreSQL for Database
+- Uses [Go Simple Mail](https://github.com/xhit/go-simple-mail) for Sending Email
