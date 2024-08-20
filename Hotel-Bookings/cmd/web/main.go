@@ -30,6 +30,21 @@ func main() {
 	}
 	defer db.SQL.Close()
 
+	defer close(app.MailChan)
+
+	fmt.Println("Starting mail listener...")
+	listenForMail()
+
+	// msg := models.MailData{
+	// 	To:       "a@test.com",
+	// 	From:     "server@mail.com",
+	// 	Subject:  "Reservation Confirmation",
+	// 	Content:  "test",
+	// 	Template: "basic.html",
+	// }
+
+	// app.MailChan <- msg
+
 	fmt.Println("Run Web Application at localhost" + portNumber)
 	//_ = http.ListenAndServe(portNumber, nil)
 
@@ -48,6 +63,9 @@ func SetUpAppConfig() (*driver.DB, error) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 	// if you want to change tmpl file and check easier, set app.UserCache = false
 	app.InProduction = false
 
