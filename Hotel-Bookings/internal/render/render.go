@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/config"
 	"github.com/doantaydo/Learning-GO_Web-Application/Hotel-Bookings/internal/helpers"
@@ -14,10 +15,17 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
 
 var app *config.AppConfig
 var pathToTemplates = "./templates"
+
+// HumanDate returns time in YYYY-MM-DD
+func HumanDate(t time.Time) string {
+	return t.Format("2006-01-02")
+}
 
 // NewRenderer sets the config for the package
 func NewRenderer(a *config.AppConfig) {
