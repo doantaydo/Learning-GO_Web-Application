@@ -314,10 +314,16 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
-		http.Error(w, "Form is invalid!", http.StatusSeeOther)
+
+		stringMap := make(map[string]string)
+		stringMap["start_date"] = reservation.StartDate.Format("2006-01-02")
+		stringMap["end_date"] = reservation.EndDate.Format("2006-01-02")
+
+		w.WriteHeader(http.StatusSeeOther)
 		_ = render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
-			Form: form,
-			Data: data,
+			Form:      form,
+			Data:      data,
+			StringMap: stringMap,
 		})
 		return
 	}
@@ -532,8 +538,7 @@ func (m *Repository) AdminPostShowReservation(w http.ResponseWriter, r *http.Req
 		helpers.ServerError(w, err)
 		return
 	}
-
-	exploded := strings.Split(r.RequestURI, "/")
+	exploded := strings.Split(r.URL.String(), "/")
 
 	id, err := strconv.Atoi(exploded[4])
 	if err != nil {
@@ -643,25 +648,10 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 			if y.ReservationID > 0 {
 				// it's a reservation
 				for d := y.StartDate; d.After(y.EndDate) == false; d = d.AddDate(0, 0, 1) {
-					// if d.AddDate(0, 0, 1).After(y.EndDate) == true {
-					// 	break
-					// }
 					reservationMap[d.Format("2006-01-02")] = y.ReservationID
 				}
 			} else {
-				// it's a block
-				//blockMap[y.StartDate.Format("2006-01-02")] = y.ID
-				// if y.StartDate.AddDate(0, 0, 2).After(y.EndDate) == true {
-				// 	blockMap[y.StartDate.Format("2006-01-02")] = y.ID
-				// } else {
-				// 	for d := y.StartDate; d.After(y.EndDate) == false; d = d.AddDate(0, 0, 1) {
-				// 		blockMap[d.Format("2006-01-02")] = y.ID
-				// 	}
-				// }
 				for d := y.StartDate; d.After(y.EndDate) == false; d = d.AddDate(0, 0, 1) {
-					// if d.AddDate(0, 0, 1).After(y.EndDate) == true {
-					// 	break
-					// }
 					blockMap[d.Format("2006-01-02")] = y.ID
 				}
 			}

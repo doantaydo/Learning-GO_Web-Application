@@ -20,7 +20,12 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate":  render.HumanDate,
+	"formatDate": render.FormatDate,
+	"iterate":    render.Iterate,
+	"add":        render.Add,
+}
 var app config.AppConfig
 var session *scs.SessionManager
 var pathToTemplates = "./../../templates"
@@ -28,6 +33,10 @@ var pathToTemplates = "./../../templates"
 func TestMain(m *testing.M) {
 	// put in the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(map[string]int{})
 	// if you want to change tmpl file and check easier, set app.UserCache = false
 	app.InProduction = true
 
@@ -99,10 +108,29 @@ func getRoutes() http.Handler {
 	mux.Post("/make-reservation", Repo.PostReservation)
 	mux.Get("/reservation-summary", Repo.ReservationSummary)
 
+	mux.Get("/user/login", Repo.ShowLogin)
+	mux.Post("/user/login", Repo.PostShowLogin)
+	mux.Get("/user/logout", Repo.Logout)
+
 	mux.Get("/favicon.ico", Repo.EmptyFunc)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
+	mux.Route("/admin", func(mux chi.Router) {
+		//mux.Use(Auth)
+		mux.Get("/dashboard", Repo.AdminDashboard)
+
+		mux.Get("/reservations-new", Repo.AdminNewReservations)
+		mux.Get("/reservations-all", Repo.AdminAllReservations)
+		mux.Get("/reservations-calendar", Repo.AdminReservationsCalendar)
+		mux.Post("/reservations-calendar", Repo.AdminPostReservationsCalendar)
+		mux.Get("/process-reservation/{src}/{id}/do", Repo.AdminProcessReservation)
+		mux.Get("/delete-reservation/{src}/{id}/do", Repo.AdminDeleteReservation)
+
+		mux.Get("/reservations/{src}/{id}/show", Repo.AdminShowReservation)
+		mux.Post("/reservations/{src}/{id}", Repo.AdminPostShowReservation)
+	})
 
 	return mux
 }
@@ -157,3 +185,14 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 
 	return myCache, nil
 }
+
+// func Auth(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		if !helpers.IsAuthenticate(r) {
+// 			session.Put(r.Context(), "error", "Log in first!")
+// 			http.Redirect(w, r, "user/login", http.StatusSeeOther)
+// 			return
+// 		}
+// 		next.ServeHTTP(w, r)
+// 	})
+// }

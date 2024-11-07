@@ -77,6 +77,9 @@ func (m *testDBRepo) UpdateUser(user models.User) error {
 
 // Authenticate authenticates a user
 func (m *testDBRepo) Authenticate(email, password string) (int, string, error) {
+	if email == "jack@user.com" {
+		return 0, "", errors.New("Some errors")
+	}
 	return 1, "abc", nil
 }
 
@@ -92,7 +95,9 @@ func (m *testDBRepo) AllNewReservations() ([]models.Reservation, error) {
 
 // GetReservationByID returns a reservation by ID
 func (m *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
-	return models.Reservation{}, nil
+	return models.Reservation{
+		ID: id,
+	}, nil
 }
 
 // UpdateReservation updates reservation in database
@@ -113,12 +118,32 @@ func (m *testDBRepo) UpdateProcessedForReservation(id, processed int) error {
 // AllRooms returns all rooms
 func (m *testDBRepo) AllRooms() ([]models.Room, error) {
 	var rooms []models.Room
+	rooms = append(rooms, models.Room{
+		ID:       1,
+		RoomName: "Room_1",
+	})
+	rooms = append(rooms, models.Room{
+		ID:       2,
+		RoomName: "Room_2",
+	})
 	return rooms, nil
 }
 
 // GetRestrictionsForRoomByDate returns all restrictions for a room by date range
 func (m *testDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
 	var restrictions []models.RoomRestriction
+	restrictions = append(restrictions, models.RoomRestriction{
+		StartDate:     start,
+		EndDate:       end,
+		ReservationID: 1,
+		ID:            1,
+	})
+	restrictions = append(restrictions, models.RoomRestriction{
+		StartDate:     start,
+		EndDate:       end,
+		ReservationID: 0,
+		ID:            2,
+	})
 	return restrictions, nil
 }
 
