@@ -39,7 +39,10 @@ var theTests = []struct {
 	{"show reservations", "/admin/reservations/new/1/show", "GET", http.StatusOK},
 	{"non-existent", "/non/existent", "GET", http.StatusNotFound},
 	{"show reservations calendar", "/admin/reservations-calendar", "GET", http.StatusOK},
-	{"show reservations calendar with year", "/admin/reservations-calendar?y=2024&month=8", "GET", http.StatusOK},
+	{"process reservation calendar", "/admin/process-reservation/calendar/1/do", "GET", http.StatusOK},
+	{"process reservation calendar with year", "/admin/process-reservation/calendar/1/do?y=2024&m=01", "GET", http.StatusOK},
+	{"delete reservation calendar", "/admin/delete-reservation/calendar/1/do", "GET", http.StatusOK},
+	{"delete reservation calendar with year", "/admin/delete-reservation/calendar/1/do?y=2024&m=01", "GET", http.StatusOK},
 	{"favicon", "/favicon.ico", "GET", http.StatusOK},
 	//-------------------------------------------------------------------------------//
 	// {"post-search-availability", "/search-availability", "POST", []postData{
@@ -666,7 +669,7 @@ var updateReservationTests = []struct {
 	},
 	{
 		"HAVE YEAR",
-		"",
+		"calendar",
 		"2024",
 		"/admin/reservations-calendar?y=2024&m=01",
 	},
@@ -696,16 +699,58 @@ func TestPostShowReservation(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusSeeOther {
-			t.Errorf("Failed %s: expected code %d, but got %d", e.name, http.StatusSeeOther, rr.Code)
+			t.Errorf("Failed PostShowReservation - %s: expected code %d, but got %d", e.name, http.StatusSeeOther, rr.Code)
 		}
 
 		// get the URL from test
 		actualLoc, _ := rr.Result().Location()
 		if actualLoc.String() != e.expectedLocation {
-			t.Errorf("Failed %s: expected location %s, but got %s", e.name, e.expectedLocation, actualLoc.String())
+			t.Errorf("Failed PostShowReservation - %s: expected location %s, but got %s", e.name, e.expectedLocation, actualLoc.String())
 		}
 	}
+}
 
+func TestPostReservationsCalendar(t *testing.T) {
+	postData := url.Values{}
+	postData.Add("year", "2024")
+	postData.Add("month", "1")
+
+	block_map_1 := make(map[string]int)
+	block_map_1["2024-11-12"] = 1
+	postData.Add("remove_block_1_2024-11-12", "")
+
+	block_map_2 := make(map[string]int)
+	block_map_2["2024-11-12"] = 1
+	postData.Add("remove_block_2_2024-11-12", "1")
+
+	postData.Add("add_block_1_2024-11-11", "1")
+
+	// create request
+	req, _ := http.NewRequest("POST", "/admin/reservations-calendar", strings.NewReader(postData.Encode()))
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+
+	// set the header
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+
+	session.Put(req.Context(), "block_map_1", block_map_1)
+	session.Put(req.Context(), "block_map_2", block_map_2)
+
+	// call the handler
+	handler := http.HandlerFunc(Repo.AdminPostReservationsCalendar)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Failed %s: expected code %d, but got %d", "TestPostReservationsCalendar", http.StatusSeeOther, rr.Code)
+	}
+
+	// get the URL from test
+	expectedLocation := "/admin/reservations-calendar?y=2024&m=1"
+	actualLoc, _ := rr.Result().Location()
+	if actualLoc.String() != expectedLocation {
+		t.Errorf("Failed %s: expected location %s, but got %s", "TestPostReservationsCalendar", expectedLocation, actualLoc.String())
+	}
 }
 
 func getCtx(req *http.Request) context.Context {

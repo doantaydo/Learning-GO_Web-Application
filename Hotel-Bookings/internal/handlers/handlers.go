@@ -699,7 +699,7 @@ func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *htt
 			// ok will be false if the value is not in the map
 			if val, ok := curMap[name]; ok {
 				// only pay attention to values > 0, and that are not in the form post
-				// the rest are just placeholders fpr days without blocks
+				// the rest are just placeholders for days without blocks
 				if val > 0 {
 					if !form.Has(fmt.Sprintf("remove_block_%d_%s", room.ID, name)) {
 						// delete the restriction by ID
