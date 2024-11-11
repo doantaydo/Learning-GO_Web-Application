@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -65,10 +66,28 @@ func SetUpAppConfig() (*driver.DB, error) {
 	gob.Register(models.Restriction{})
 	gob.Register(map[string]int{})
 
+	// read flags
+	inProduction := flag.Bool("production", true, "Application is in production")
+	useCache := flag.Bool("cache", true, "Use template cache")
+	dbName := flag.String("dbName", "", "Database name")
+	dbHost := flag.String("dbHost", "localhost", "Database host")
+	dbUser := flag.String("dbUser", "", "Database username")
+	dbPass := flag.String("dbPass", "", "Database password")
+	dbPort := flag.String("dbPort", "5432", "Database port")
+	dbSSL := flag.String("dbSSL", "disable", "Database SSL settings (disable, prefer, require)")
+
+	flag.Parse()
+
+	if *dbName == "" || *dbUser == "" {
+		fmt.Println("Missing required flags")
+		os.Exit(1)
+	}
+
 	mailChan := make(chan models.MailData)
 	app.MailChan = mailChan
 	// if you want to change tmpl file and check easier, set app.UserCache = false
-	app.InProduction = false
+	app.InProduction = *inProduction
+	app.UseCache = *useCache
 
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
@@ -86,7 +105,9 @@ func SetUpAppConfig() (*driver.DB, error) {
 
 	// Connect to database
 	log.Println("Connecting to database...")
-	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=24072001do")
+	connectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", *dbHost, *dbPort, *dbName, *dbUser, *dbPass, *dbSSL)
+	//db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=24072001do")
+	db, err := driver.ConnectSQL(connectionString)
 	if err != nil {
 		log.Fatal("Cannot connect to database! Dying...")
 	}
@@ -99,7 +120,6 @@ func SetUpAppConfig() (*driver.DB, error) {
 		return nil, err
 	}
 	app.TemplateCache = templateCache
-	app.UseCache = app.InProduction
 
 	// Send AppConfig to handlers
 	repo := handlers.NewRepo(&app, db)
