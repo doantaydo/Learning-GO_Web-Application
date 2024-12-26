@@ -12,7 +12,7 @@ In this course, I built a Basic Web Application and a Bookings and Reservations 
 - Uses PostgreSQL for Database
 - Uses [Go Simple Mail](https://github.com/xhit/go-simple-mail) for Sending Email
 
-Status: Completed.
+Status: Completed.<br />
 What I can improve:
 - Add sign in page, which should add new accounts as Client accounts
 - Add method which allows Admin accounts change status of accounts from Client to Admin
