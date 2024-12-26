@@ -39,14 +39,6 @@
             #lastPara {
                 text-decoration: underline;
             }
-            .my-footer {
-                height: 11em;
-                background-color: #163b65;
-                /* margin-top: 1.5em; */
-                padding: 1em;
-                color: white;
-                font-size: 80%;
-            }
         </style>
 
     </head>
@@ -105,7 +97,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="#">&nbsp;</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -122,8 +114,8 @@
                         Rooms
                         </a>
                         <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/generals-quarters">General's Quarters</a></li>
-                        <li><a class="dropdown-item" href="/majors-suite">Major's Suite</a></li>
+                            <li><a class="dropdown-item" href="/generals-quarters">General's Quarters</a></li>
+                            <li><a class="dropdown-item" href="/majors-suite">Major's Suite</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -136,13 +128,13 @@
                         {{if eq .IsAuthenticated 1}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Admin
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="/admin/dashboard">Dashboard</a>
-                                <a class="dropdown-item" href="/user/logout">Logout</a>
-                            </div>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="/admin/dashboard">Dashboard</a></li>
+                                <li></li><a class="dropdown-item" href="/user/logout">Logout</a></li>
+                            </ul>
                         </li>
                         {{else}}
                             <a class="nav-link" href="/user/login" tabindex="-1" aria-disabled="true">Login</a>
